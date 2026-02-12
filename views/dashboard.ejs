@@ -1,0 +1,111 @@
+<%
+  const headerRight = `
+    <form method="POST" action="/logout">
+      <button class="btn secondary" type="submit">Logout</button>
+    </form>
+  `;
+
+  const body = `
+    <div class="card">
+      <div class="flex" style="justify-content:space-between;flex-wrap:wrap">
+        <div>
+          <div class="pill">Merchant ID: <b style="color:#e5e7eb">${merchantId || "-"}</b></div>
+          <div class="pill" style="margin-left:8px">Tanggal: <b style="color:#e5e7eb">${today}</b></div>
+        </div>
+        <div class="muted">Auto-poll setiap 15 detik</div>
+      </div>
+
+      <div class="sp"></div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Order/Tx ID</th>
+            <th>Amount</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="4" class="muted">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      const merchantId = ${JSON.stringify(merchantId || "")};
+      const date = ${JSON.stringify(today)};
+      const seen = new Set();
+
+      function fmtAmount(tx){
+        const a = tx?.metadata?.transaction?.amount ?? tx?.metadata?.transaction?.total_amount ?? null;
+        if (a == null) return "-";
+        try { return new Intl.NumberFormat("id-ID", { style:"currency", currency:"IDR" }).format(Number(a)); }
+        catch { return String(a); }
+      }
+
+      function getTime(tx){
+        return tx?.metadata?.transaction?.transaction_time || tx?.time || "-";
+      }
+
+      function getId(tx){
+        return tx?.id || tx?.metadata?.transaction?.order_id || tx?.metadata?.transaction?.id || "-";
+      }
+
+      function getCategory(tx){
+        return tx?.category || tx?.metadata?.transaction?.category || "-";
+      }
+
+      async function poll(){
+        if (!merchantId) return;
+        try{
+          const r = await fetch(\`/api/mutasi?merchantId=\${encodeURIComponent(merchantId)}&date=\${encodeURIComponent(date)}\`, {
+            headers: { "Accept": "application/json" }
+          });
+          if (r.status === 401) {
+            location.href = "/login";
+            return;
+          }
+          const j = await r.json();
+          if (!j.ok) return;
+
+          const hits = j.hits || [];
+          const rows = document.getElementById("rows");
+          if (!rows) return;
+
+          // build newest-first
+          let html = "";
+          for (const tx of hits) {
+            const id = getId(tx);
+            if (seen.has(id)) continue;
+            seen.add(id);
+
+            html += \`
+              <tr>
+                <td>\${getTime(tx)}</td>
+                <td style="font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace">\${id}</td>
+                <td>\${fmtAmount(tx)}</td>
+                <td>\${getCategory(tx)}</td>
+              </tr>
+            \`;
+          }
+
+          // prepend new rows
+          if (html) rows.innerHTML = html + rows.innerHTML;
+
+          // if first load and no new rows inserted, show empty state
+          if (rows.innerHTML.includes("Loading...")) {
+            rows.innerHTML = hits.length ? "" : '<tr><td colspan="4" class="muted">Belum ada transaksi hari ini.</td></tr>';
+          }
+        }catch(e){
+          // silent minimal
+        }
+      }
+
+      poll();
+      setInterval(poll, 15000);
+    </script>
+  `;
+
+%>
+<%- include("_layout", { title: "Dashboard", headerRight, body }) %>
