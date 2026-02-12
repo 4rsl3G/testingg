@@ -86,7 +86,7 @@ function setStateCookie(res, state) {
   res.cookie(COOKIE_NAME, seal(payload), {
     httpOnly: true,
     sameSite: "lax",
-    secure: false, // kalau sudah https: true
+    secure: true, // kalau sudah https: true
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   });
