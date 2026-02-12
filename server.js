@@ -18,7 +18,7 @@ const app = express();
 
 const PORT = Number(process.env.PORT || 3000);
 const COOKIE_NAME = process.env.COOKIE_NAME || "gobiz_auth";
-const COOKIE_KEY = Buffer.from(process.env.COOKIE_KEY_BASE64 || "", "base64");
+const COOKIE_KEY = Buffer.from(process.env.COOKIE_KEY_BASE64, "base64");
 
 if (COOKIE_KEY.length !== 32) {
   throw new Error("COOKIE_KEY_BASE64 harus 32 bytes base64 (AES-256-GCM).");
