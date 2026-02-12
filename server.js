@@ -15,6 +15,8 @@ const {
 } = require("./gobizStateless");
 
 const app = express();
+// kalau di belakang Nginx / Cloudflare (umum di VPS)
+app.set("trust proxy", 1);
 
 const PORT = Number(process.env.PORT || 3000);
 const COOKIE_NAME = process.env.COOKIE_NAME || "gobiz_auth";
