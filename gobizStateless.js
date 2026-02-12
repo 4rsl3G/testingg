@@ -20,14 +20,15 @@ async function rateLimit(state) {
   state.lastRequest = Date.now();
 }
 
-function ensureState(state = {}) {
+function ensureState(state) {
+  const s = state && typeof state === "object" ? state : {};
   return {
-    accessToken: state.accessToken || null,
-    refreshToken: state.refreshToken || null,
-    tokenExpiry: state.tokenExpiry || null,
-    uniqueId: state.uniqueId || crypto.randomUUID(),
-    ua: state.ua || new UserAgents({ deviceCategory: "desktop" }).toString(),
-    lastRequest: state.lastRequest || 0,
+    accessToken: s.accessToken || null,
+    refreshToken: s.refreshToken || null,
+    tokenExpiry: s.tokenExpiry || null,
+    uniqueId: s.uniqueId || crypto.randomUUID(),
+    ua: s.ua || new UserAgents({ deviceCategory: "desktop" }).toString(),
+    lastRequest: s.lastRequest || 0,
   };
 }
 
