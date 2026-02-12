@@ -1,0 +1,28 @@
+<%
+  const body = `
+    <div class="card">
+      <h2 style="margin:0 0 6px">Login</h2>
+      <div class="muted">Token tidak disimpan di server. Disimpan sebagai cookie httpOnly terenkripsi di browser.</div>
+      <div class="sp"></div>
+      ${error ? `<div class="err">${error}</div>` : ``}
+
+      <form method="POST" action="/login/email">
+        <div class="row two">
+          <div>
+            <label>Email</label>
+            <input name="email" type="email" required placeholder="email@domain.com" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input name="password" type="password" required placeholder="••••••••" />
+          </div>
+        </div>
+        <div style="margin-top:12px" class="flex">
+          <button class="btn" type="submit">Login Email</button>
+          <a class="btn secondary" href="/otp" style="text-decoration:none;display:inline-block">Login OTP</a>
+        </div>
+      </form>
+    </div>
+  `;
+%>
+<%- include("_layout", { title: "Login", headerRight: "", body }) %>
