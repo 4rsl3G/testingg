@@ -1,0 +1,51 @@
+<%
+  let inner = "";
+  if (step === "request") {
+    inner = `
+      <form method="POST" action="/otp/request">
+        <div class="row two">
+          <div>
+            <label>Nomor HP</label>
+            <input name="phone" required placeholder="812xxxxxxx" />
+          </div>
+          <div>
+            <label>Country Code</label>
+            <input name="countryCode" value="62" required />
+          </div>
+        </div>
+        <div style="margin-top:12px" class="flex">
+          <button class="btn" type="submit">Request OTP</button>
+          <a class="btn secondary" href="/login" style="text-decoration:none;display:inline-block">Kembali</a>
+        </div>
+      </form>
+    `;
+  } else {
+    inner = `
+      <form method="POST" action="/otp/verify">
+        <input type="hidden" name="otpToken" value="${otpToken}" />
+        <div class="row">
+          <div>
+            <label>Masukkan OTP (${otpLength} digit)</label>
+            <input name="otp" required inputmode="numeric" placeholder="123456" />
+          </div>
+        </div>
+        <div style="margin-top:12px" class="flex">
+          <button class="btn" type="submit">Verifikasi</button>
+          <a class="btn secondary" href="/otp" style="text-decoration:none;display:inline-block">Ulangi</a>
+        </div>
+        <div class="muted" style="margin-top:10px">OTP token tidak disimpan di cookie. Hanya di form ini.</div>
+      </form>
+    `;
+  }
+
+  const body = `
+    <div class="card">
+      <h2 style="margin:0 0 6px">Login OTP</h2>
+      <div class="muted">Pakai OTP untuk mendapatkan token.</div>
+      <div class="sp"></div>
+      ${error ? `<div class="err">${error}</div>` : ``}
+      ${inner}
+    </div>
+  `;
+%>
+<%- include("_layout", { title: "Login OTP", headerRight: "", body }) %>
